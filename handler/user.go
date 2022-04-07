@@ -58,11 +58,6 @@ func (h *userHandler) Login(c *gin.Context){
 		//input struct passing ke service
 		//didalam service mencari dengan bantuan repository user dengan email x
 		//jika ketemu maka perlu mencocokkan password
-		//mulai membuat folder dan coding dari pertama - ketiga
-		//cara pertama membuat repository terlebih dahulu 
-		//kedua membuat service
-		//ketiga membuat handler
-
 		var input user.LoginInput
 
 		err := c.ShouldBindJSON(&input)
