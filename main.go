@@ -27,18 +27,9 @@ func main() {
 	api := router.Group("/api/v1")
 	
 	api.POST("/users", userHandler.RegisterUser)
+	api.POST("/sessions", userHandler.Login)
 
 	router.Run()
-
-	// userInput := user.RegisterUserInput{}
-	// userInput.Name = "Test save from service"
-	// userInput.Email = "service@gmail.com"
-	// userInput.Occupation = "Programmer GO"
-	// userInput.Password = "Junior45"
-
-	// userService.RegisterUser(userInput)
-
-
 	//langkah-langkahnya yang harus dibuat sblm form html
 	//5input : from user in form html
 	//4handler : mapping input from user menjadi -> sebuah struct input
