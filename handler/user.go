@@ -58,6 +58,11 @@ func (h *userHandler) Login(c *gin.Context){
 		//input struct passing ke service
 		//didalam service mencari dengan bantuan repository user dengan email x
 		//jika ketemu maka perlu mencocokkan password
+		//mulai membuat folder dan coding dari pertama - ketiga
+		//cara pertama membuat repository terlebih dahulu 
+		//kedua membuat service
+		//ketiga membuat handler
+
 		var input user.LoginInput
 
 		err := c.ShouldBindJSON(&input)
@@ -88,7 +93,6 @@ func (h *userHandler) Login(c *gin.Context){
 	c.JSON(http.StatusOK, response)
 
 }
-<<<<<<< HEAD
 
 func (h *userHandler) CheckEmailAvailability(c *gin.Context){
 	//ada input email dari user
@@ -130,5 +134,3 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context){
 		c.JSON(http.StatusOK, response)		
 
 }
-=======
->>>>>>> 84ba90602ce05596bd6a1a1dee1257fa026367a9
