@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"golang-startup-web/helper"
 	"golang-startup-web/user"
 	"net/http"
@@ -133,4 +134,51 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context){
 		response := helper.APIResponse(metaMessage, http.StatusOK, "Success", data)
 		c.JSON(http.StatusOK, response)		
 
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	//tangkap input dari user
+	//simpan gambar di folder "images/"
+	//di service kita panggil repo
+	//JWT (sementara pakai hardcode, seakan2 user yang login ID = 1)
+	//repo ambil data user yg ID = 1
+	//repo update data user simpan lokasi file
+
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false }
+		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	//harusnya dapat dari jwt, sementara manual dulu
+	userId := 1
+	path := fmt.Sprintf("images/%d-%s", userId, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false }
+		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+
+	_, err = h.userService.SaveAvatar(userId, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false }
+		response := helper.APIResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true }
+		response := helper.APIResponse("Avatar successfully uploaded", http.StatusOK, "success", data)
+
+		c.JSON(http.StatusOK, response)
+		
 }
