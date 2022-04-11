@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"golang-startup-web/auth"
 	"golang-startup-web/helper"
 	"golang-startup-web/user"
 	"net/http"
@@ -11,17 +12,14 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler{
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler{
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context){
-	//tangkap input dari user
-	// mapping input dari user ke struct RegisterUserInput
-	// struct diatas kita passing ke parameter service
-
 	var input user.RegisterUserInput
 
 	err := c.ShouldBindJSON(&input)
@@ -42,9 +40,13 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 		return
 	}
 
-	//token, err := h.jwtService.GenerateToken()
-
-	formatter := user.FormatUser(newUser, "tokentokentoken")
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil{
+		response := helper.APIResponse("Register account failed", http.StatusBadRequest, "Error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	formatter := user.FormatUser(newUser, token)
 
 	response := helper.APIResponse("Account has been registered", http.StatusOK, "Success", formatter)
 
@@ -52,18 +54,6 @@ func (h *userHandler) RegisterUser(c *gin.Context){
 }
 
 func (h *userHandler) Login(c *gin.Context){
-		//step
-		//user memasukan input berupa email dan password
-		//input ditangkap handler 
-		//mapping dari input user ke input struct
-		//input struct passing ke service
-		//didalam service mencari dengan bantuan repository user dengan email x
-		//jika ketemu maka perlu mencocokkan password
-		//mulai membuat folder dan coding dari pertama - ketiga
-		//cara pertama membuat repository terlebih dahulu 
-		//kedua membuat service
-		//ketiga membuat handler
-
 		var input user.LoginInput
 
 		err := c.ShouldBindJSON(&input)
@@ -87,7 +77,13 @@ func (h *userHandler) Login(c *gin.Context){
 				
 		}
 
-		formatter := user.FormatUser(loggedinUser, "tokentokentoken")
+		token, err := h.authService.GenerateToken(loggedinUser.ID)
+		if err != nil{
+		response := helper.APIResponse("Login failed", http.StatusBadRequest, "Error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+		formatter := user.FormatUser(loggedinUser, token)
 
 			response := helper.APIResponse("Login Successfully", http.StatusOK, "Success", formatter)
 
@@ -96,11 +92,6 @@ func (h *userHandler) Login(c *gin.Context){
 }
 
 func (h *userHandler) CheckEmailAvailability(c *gin.Context){
-	//ada input email dari user
-	// input email di mapping ke struc input
-	// struct input di passing ke service
-	// service akan manggil repository untuk menentukan apakah email sudah ada di database atau belum
-	// repo akan melakukan query ke database
 	var input user.CheckEmailInput
 
 		err := c.ShouldBindJSON(&input)
@@ -137,13 +128,6 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context){
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	//tangkap input dari user
-	//simpan gambar di folder "images/"
-	//di service kita panggil repo
-	//JWT (sementara pakai hardcode, seakan2 user yang login ID = 1)
-	//repo ambil data user yg ID = 1
-	//repo update data user simpan lokasi file
-
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false }
