@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"golang-startup-web/auth"
+	"golang-startup-web/campaign"
 	"golang-startup-web/handler"
 	"golang-startup-web/helper"
 	"golang-startup-web/user"
@@ -25,6 +26,21 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepository.FindByUserID(1)
+
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println("debug")
+	fmt.Println(len(campaigns))
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+		fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+	}
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 	if err != nil {
