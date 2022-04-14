@@ -1,7 +1,7 @@
 package campaign
 
 type Service interface {
-	FindCampaigns(userID int) ([]Campaign, error)
+	GetCampaigns(userID int) ([]Campaign, error)
 }
 
 type service struct {
@@ -21,6 +21,7 @@ func (s *service) FindCampaigns(userID int) ([]Campaign, error) {
 
 		return campaigns, nil
 	}
+
 	campaigns, err := s.repository.FindAll()
 	if err != nil {
 		return campaigns, err
