@@ -28,7 +28,7 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	user.Email = input.Email
 	user.Occupation = input.Occupation
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
-	if err != nil{
+	if err != nil {
 		return user, err
 	}
 
@@ -36,23 +36,23 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	user.Role = "User"
 
 	newUser, err := s.repository.Save(user)
-	if err != nil{
+	if err != nil {
 		return newUser, err
 	}
 
 	return newUser, nil
 }
 
-func (s *service) Login(input LoginInput) (User, error){
+func (s *service) Login(input LoginInput) (User, error) {
 	email := input.Email
 	password := input.Password
 
 	user, err := s.repository.FindByEmail(email)
-	if err != nil{
+	if err != nil {
 		return user, err
 	}
 
-	if(user.ID == 0){
+	if user.ID == 0 {
 		return user, errors.New("No user found on that email")
 	}
 
@@ -65,14 +65,14 @@ func (s *service) Login(input LoginInput) (User, error){
 
 }
 
-func (s *service)	IsEmailAvailable(input CheckEmailInput) (bool, error) {
+func (s *service) IsEmailAvailable(input CheckEmailInput) (bool, error) {
 	email := input.Email
 	user, err := s.repository.FindByEmail(email)
 	if err != nil {
 		return false, err
 	}
 
-	if(user.ID == 0){
+	if user.ID == 0 {
 		return true, nil
 	}
 
@@ -80,7 +80,7 @@ func (s *service)	IsEmailAvailable(input CheckEmailInput) (bool, error) {
 
 }
 
-func (s *service) SaveAvatar(ID int, fileLocation string) (User, error){
+func (s *service) SaveAvatar(ID int, fileLocation string) (User, error) {
 	//dapatkan user berdasarkan id
 	user, err := s.repository.FindByID(ID)
 	if err != nil {
@@ -97,13 +97,13 @@ func (s *service) SaveAvatar(ID int, fileLocation string) (User, error){
 	return updatedUser, nil
 }
 
-func (s *service) GetUserByID(ID int) (User, error){
+func (s *service) GetUserByID(ID int) (User, error) {
 	user, err := s.repository.FindByID(ID)
 	if err != nil {
 		return user, err
 	}
 
-	if(user.ID == 0){
+	if user.ID == 0 {
 		return user, errors.New("No user found on with that ID")
 	}
 
