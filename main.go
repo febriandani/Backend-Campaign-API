@@ -25,6 +25,7 @@ func main() {
 
 	api := route.Group("/api/v1")
 	api.POST("/regusers", userHandler.RegisterUser)
+	api.POST("/login", userHandler.Login)
 
 	route.Run()
 }
