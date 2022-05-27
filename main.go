@@ -1,6 +1,7 @@
 package main
 
 import (
+	"golang-startup-web/auth"
 	"golang-startup-web/handler"
 	"golang-startup-web/user"
 	"log"
@@ -19,7 +20,9 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	authService := auth.NewService()
+
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	route := gin.Default()
 

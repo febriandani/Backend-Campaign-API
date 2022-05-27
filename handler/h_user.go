@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"golang-startup-web/auth"
 	"golang-startup-web/helper"
 	"golang-startup-web/user"
 	"net/http"
@@ -11,17 +12,14 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
-	//tangkap input dari user
-	//map input dari user ke struct RegisterUserInput
-	//struct di atas kita passing sebagai parameter servie
-
 	var input user.RegisterUserInput
 
 	err := c.ShouldBindJSON(&input)
@@ -36,14 +34,20 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	}
 
 	newUser, err := h.userService.RegisterUser(input)
-
 	if err != nil {
 		response := helper.APIresponse("Register Account Failed", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	formatter := user.FormatUser(newUser, "tokentokentoken")
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.APIresponse("Register Account Failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(newUser, token)
 	response := helper.APIresponse("Account has been registered", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 }
@@ -71,7 +75,14 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(logged, "tokentokentoken")
+	token, err := h.authService.GenerateToken(logged.ID)
+	if err != nil {
+		response := helper.APIresponse("Login Failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(logged, token)
 	response := helper.APIresponse("Login Successfully", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 
@@ -118,13 +129,6 @@ func (h *userHandler) CheckEmailAvailable(c *gin.Context) {
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	//input dari user
-	//simpan gambar di folder "images/"
-	//di service panggil repository
-	// jwt (sementara hardcode, seakan" user yang login ID = 1)
-	// repository ambil dat user yang ID = 1
-	// repository update data user simpan lokasi file
-
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
