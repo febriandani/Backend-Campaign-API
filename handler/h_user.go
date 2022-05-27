@@ -129,13 +129,6 @@ func (h *userHandler) CheckEmailAvailable(c *gin.Context) {
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	//input dari user
-	//simpan gambar di folder "images/"
-	//di service panggil repository
-	// jwt (sementara hardcode, seakan" user yang login ID = 1)
-	// repository ambil dat user yang ID = 1
-	// repository update data user simpan lokasi file
-
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
