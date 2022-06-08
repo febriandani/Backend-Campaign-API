@@ -43,7 +43,6 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
-		//cek jika didalam authHeader tidak ada Bearer
 		if !strings.Contains(authHeader, "Bearer") {
 			response := helper.APIresponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -51,9 +50,8 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		}
 
 		tokenString := ""
-		//split menggabungkan Bearer spasi tokentokentoken
 		arrayToken := strings.Split(authHeader, " ")
-		if len(tokenString) == 2 {
+		if len(arrayToken) == 2 {
 			tokenString = arrayToken[1]
 		}
 
@@ -83,5 +81,4 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 
 		c.Set("currentUser", user)
 	}
-
 }
