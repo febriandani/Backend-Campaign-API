@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"golang-startup-web/auth"
 	"golang-startup-web/campaign"
 	"golang-startup-web/handler"
@@ -33,20 +32,18 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaigns, err := campaignService.FindCampaigns(7)
-	fmt.Println(len(campaigns))
-
+	//handler
 	userHandler := handler.NewUserHandler(userService, authService)
-	// campaignHandler :=
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	route := gin.Default()
-
+	//route group
 	api := route.Group("/api/v1")
 	api.POST("/regusers", userHandler.RegisterUser)
 	api.POST("/login", userHandler.Login)
 	api.GET("/email_check", userHandler.CheckEmailAvailable)
 	api.POST("/upload_av", authMiddleware(authService, userService), userHandler.UploadAvatar)
-
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	route.Run()
 }
 
