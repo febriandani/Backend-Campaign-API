@@ -24,28 +24,20 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	//repository
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+
+	//service
 	userService := user.NewService(userRepository)
+	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaigns, _ := campaignRepository.FindByUserID(6)
-	fmt.Println("dbug")
-	fmt.Println("dbug")
-	fmt.Println("dbug")
-	fmt.Println("dbug")
+	campaigns, err := campaignService.FindCampaigns(7)
 	fmt.Println(len(campaigns))
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		if len(campaign.CampaignImages) > 0 {
-			fmt.Println(campaign.CampaignImages[0].FileName)
-		} else {
-			fmt.Println("No Image File Of Campaign")
-		}
-
-	}
 
 	userHandler := handler.NewUserHandler(userService, authService)
+	// campaignHandler :=
 
 	route := gin.Default()
 
