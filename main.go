@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"golang-startup-web/auth"
 	"golang-startup-web/campaign"
 	"golang-startup-web/handler"
@@ -24,37 +23,27 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	//repository
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+
+	//service
 	userService := user.NewService(userRepository)
+	campaignService := campaign.NewService(campaignRepository)
 	authService := auth.NewService()
 
-	campaigns, _ := campaignRepository.FindByUserID(6)
-	fmt.Println("dbug")
-	fmt.Println("dbug")
-	fmt.Println("dbug")
-	fmt.Println("dbug")
-	fmt.Println(len(campaigns))
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		if len(campaign.CampaignImages) > 0 {
-			fmt.Println(campaign.CampaignImages[0].FileName)
-		} else {
-			fmt.Println("No Image File Of Campaign")
-		}
-
-	}
-
+	//handler
 	userHandler := handler.NewUserHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	route := gin.Default()
-
+	//route group
 	api := route.Group("/api/v1")
 	api.POST("/regusers", userHandler.RegisterUser)
 	api.POST("/login", userHandler.Login)
 	api.GET("/email_check", userHandler.CheckEmailAvailable)
 	api.POST("/upload_av", authMiddleware(authService, userService), userHandler.UploadAvatar)
-
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	route.Run()
 }
 
