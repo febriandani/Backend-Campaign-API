@@ -17,6 +17,7 @@ import (
 )
 
 func main() {
+	//configuration database mysql
 	dsn := "root:@tcp(127.0.0.1:3306)/bwastartup?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -37,16 +38,21 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	route := gin.Default()
-	//route group
+	//route untuk akses images
+	//images pertama untuk url sedangkan images ke 2 untuk foldernya
+	route.Static("/images", "./images")
+	//routing group
 	api := route.Group("/api/v1")
 	api.POST("/regusers", userHandler.RegisterUser)
 	api.POST("/login", userHandler.Login)
 	api.GET("/email_check", userHandler.CheckEmailAvailable)
 	api.POST("/upload_av", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaign/:id", campaignHandler.GetCampaign)
 	route.Run()
 }
 
+//configuration middleware for authentication Token, using JWT
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
