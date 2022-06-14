@@ -38,6 +38,9 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	route := gin.Default()
+	//route untuk akses images
+	//images pertama untuk url sedangkan images ke 2 untuk foldernya
+	route.Static("/images", "./images")
 	//routing group
 	api := route.Group("/api/v1")
 	api.POST("/regusers", userHandler.RegisterUser)
