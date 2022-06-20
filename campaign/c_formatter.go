@@ -55,6 +55,20 @@ type CampaignDetailFormatter struct {
 	UserID           int      `json:"user_id"`
 	Slug             string   `json:"slug"`
 	Perks            []string `json:"perks"`
+	//menambahkan field user dengan type campaignUserFormatter dengan nama json user
+	User CampaignUserFormatter `json:"user"`
+	//menambahkan field images berbentuk slice dengan type campaignImageFormatter dengan nama json images
+	Images []CampaignImageFormatter `json:"images"`
+}
+
+type CampaignUserFormatter struct {
+	Name     string `json:"name"`
+	ImageURL string `json:"image_url"`
+}
+
+type CampaignImageFormatter struct {
+	ImageURL  string `json:"image_url"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
@@ -81,6 +95,33 @@ func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 	}
 
 	campaignDetailFormatter.Perks = perks
+
+	//add field user from campaignUserFormatter to campaignDetailFormatter
+	user := campaign.User
+	campaignUserFormatter := CampaignUserFormatter{}
+	campaignUserFormatter.Name = user.Name
+	campaignUserFormatter.ImageURL = user.AvatarFileName
+
+	campaignDetailFormatter.User = campaignUserFormatter
+
+	//add field images from campaignImageFormatter to campaignDetailFormatter
+	images := []CampaignImageFormatter{}
+
+	for _, image := range campaign.CampaignImages {
+		campaignImageFormatter := CampaignImageFormatter{}
+		campaignImageFormatter.ImageURL = image.FileName
+
+		isPrimary := false
+		if image.IsPrimary == 1 {
+			isPrimary = true
+		}
+		campaignImageFormatter.IsPrimary = isPrimary
+
+		images = append(images, campaignImageFormatter)
+	}
+
+	campaignDetailFormatter.Images = images
+
 	return campaignDetailFormatter
 
 }
